@@ -26,8 +26,9 @@ impl Reader {
         self.buf.get(self.cursor)
     }
 
-    pub fn end(&mut self) {
+    pub fn end(&mut self) -> &mut Self {
         self.cursor = self.buf.len();
+        self
     }
 }
 
