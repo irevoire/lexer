@@ -21,6 +21,13 @@ impl Reader {
         None
     }
 
+    pub fn skip(&mut self, n: usize) -> &mut Self {
+        for _ in 0..n {
+            self.next();
+        }
+        self
+    }
+
     pub fn prev(&mut self) -> Option<&char> {
         self.cursor = self.cursor.checked_sub(1)?;
         self.buf.get(self.cursor)
@@ -33,6 +40,16 @@ impl Reader {
 
     pub fn end(&mut self) -> &mut Self {
         self.cursor = self.buf.len();
+        self
+    }
+
+    pub fn skip_space(&mut self) -> &mut Self {
+        while let Some(c) = self.next() {
+            if c != &' ' {
+                self.prev(); // to get back on te last chr
+                break;
+            }
+        }
         self
     }
 }
@@ -114,5 +131,29 @@ mod tests {
         assert_eq!(reader.cursor, 2);
         reader.start();
         assert_eq!(reader.cursor, 0);
+    }
+
+    #[test]
+    fn test_skip_space() {
+        let mut reader = init("   a    bc  ");
+        reader.skip_space();
+        assert_eq!(reader.next(), Some(&'a'));
+        reader.skip_space();
+        assert_eq!(reader.next(), Some(&'b'));
+        reader.skip_space();
+        assert_eq!(reader.next(), Some(&'c'));
+        reader.skip_space();
+        assert_eq!(reader.next(), None);
+    }
+
+    #[test]
+    fn test_skip() {
+        let mut reader = init("abcdef");
+        reader.skip(1);
+        assert_eq!(reader.next(), Some(&'b'));
+        reader.skip(2);
+        assert_eq!(reader.next(), Some(&'e'));
+        reader.skip(10);
+        assert_eq!(reader.next(), None);
     }
 }
