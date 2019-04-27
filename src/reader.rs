@@ -26,6 +26,11 @@ impl Reader {
         self.buf.get(self.cursor)
     }
 
+    pub fn start(&mut self) -> &mut Self {
+        self.cursor = 0;
+        self
+    }
+
     pub fn end(&mut self) -> &mut Self {
         self.cursor = self.buf.len();
         self
@@ -60,6 +65,14 @@ mod tests {
     }
 
     #[test]
+    fn test_prev() {
+        let mut reader = std::io::Cursor::new("ab");
+        let mut reader = Reader::new(&mut reader);
+
+        assert_eq!(reader.prev(), None);
+    }
+
+    #[test]
     fn test_end_and_prev() {
         let mut reader = std::io::Cursor::new("ab");
         let mut reader = Reader::new(&mut reader);
@@ -76,6 +89,39 @@ mod tests {
         let mut reader = Reader::new(&mut reader);
 
         assert_eq!(reader.prev(), None);
+        assert_eq!(reader.cursor, 0);
+    }
+
+    #[test]
+    fn test_next_and_prev() {
+        let mut reader = std::io::Cursor::new("ab");
+        let mut reader = Reader::new(&mut reader);
+
+        assert_eq!(reader.cursor, 0);
+        assert_eq!(reader.next(), Some(&'a'));
+        assert_eq!(reader.cursor, 1);
+        assert_eq!(reader.next(), Some(&'b'));
+        assert_eq!(reader.cursor, 2);
+        assert_eq!(reader.next(), None);
+        assert_eq!(reader.cursor, 2);
+
+        assert_eq!(reader.prev(), Some(&'b'));
+        assert_eq!(reader.cursor, 1);
+        assert_eq!(reader.prev(), Some(&'a'));
+        assert_eq!(reader.cursor, 0);
+        assert_eq!(reader.prev(), None);
+        assert_eq!(reader.cursor, 0);
+    }
+
+    #[test]
+    fn test_start_and_end() {
+        let mut reader = std::io::Cursor::new("ab");
+        let mut reader = Reader::new(&mut reader);
+
+        assert_eq!(reader.cursor, 0);
+        reader.end();
+        assert_eq!(reader.cursor, 2);
+        reader.start();
         assert_eq!(reader.cursor, 0);
     }
 }
