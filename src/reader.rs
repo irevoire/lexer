@@ -41,11 +41,14 @@ impl Reader {
 mod tests {
     use super::*;
 
+    fn init(s: &str) -> Reader {
+        let mut reader = std::io::Cursor::new(s);
+        Reader::new(&mut reader)
+    }
+
     #[test]
     fn test_next() {
-        let mut reader = std::io::Cursor::new("ab");
-        let mut reader = Reader::new(&mut reader);
-
+        let mut reader = init("ab");
         assert_eq!(reader.cursor, 0);
         assert_eq!(reader.next(), Some(&'a'));
         assert_eq!(reader.cursor, 1);
@@ -57,26 +60,20 @@ mod tests {
 
     #[test]
     fn test_empty_next() {
-        let mut reader = std::io::Cursor::new("");
-        let mut reader = Reader::new(&mut reader);
-
+        let mut reader = init("");
         assert_eq!(reader.next(), None);
         assert_eq!(reader.cursor, 0);
     }
 
     #[test]
     fn test_prev() {
-        let mut reader = std::io::Cursor::new("ab");
-        let mut reader = Reader::new(&mut reader);
-
+        let mut reader = init("ab");
         assert_eq!(reader.prev(), None);
     }
 
     #[test]
     fn test_end_and_prev() {
-        let mut reader = std::io::Cursor::new("ab");
-        let mut reader = Reader::new(&mut reader);
-
+        let mut reader = init("ab");
         reader.end();
         assert_eq!(reader.prev(), Some(&'b'));
         assert_eq!(reader.prev(), Some(&'a'));
@@ -85,18 +82,14 @@ mod tests {
 
     #[test]
     fn test_empty_prev() {
-        let mut reader = std::io::Cursor::new("");
-        let mut reader = Reader::new(&mut reader);
-
+        let mut reader = init("");
         assert_eq!(reader.prev(), None);
         assert_eq!(reader.cursor, 0);
     }
 
     #[test]
     fn test_next_and_prev() {
-        let mut reader = std::io::Cursor::new("ab");
-        let mut reader = Reader::new(&mut reader);
-
+        let mut reader = init("ab");
         assert_eq!(reader.cursor, 0);
         assert_eq!(reader.next(), Some(&'a'));
         assert_eq!(reader.cursor, 1);
@@ -115,9 +108,7 @@ mod tests {
 
     #[test]
     fn test_start_and_end() {
-        let mut reader = std::io::Cursor::new("ab");
-        let mut reader = Reader::new(&mut reader);
-
+        let mut reader = init("ab");
         assert_eq!(reader.cursor, 0);
         reader.end();
         assert_eq!(reader.cursor, 2);
