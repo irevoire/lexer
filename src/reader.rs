@@ -6,7 +6,7 @@ pub struct Reader {
 impl Reader {
     pub fn new<R: std::io::Read>(reader: &mut R) -> Self {
         let mut buf = String::new();
-        reader.read_to_string(&mut buf);
+        reader.read_to_string(&mut buf).unwrap(); // if fail we stop everything
         Reader {
             buf: buf.chars().collect(),
             cursor: 0,
