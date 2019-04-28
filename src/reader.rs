@@ -171,6 +171,7 @@ mod tests {
     fn test_get_word() {
         let mut reader = init("Hello Word!");
         assert_eq!(reader.get_word(), "Hello");
+        assert_eq!(reader.get_word(), "");
         assert_eq!(reader.next(), Some(&' '));
         assert_eq!(reader.get_word(), "Word!");
         assert_eq!(reader.next(), None);
