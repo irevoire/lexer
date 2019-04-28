@@ -1,6 +1,7 @@
 pub struct Reader {
     buf: Vec<char>,
     cursor: usize,
+    line_number: usize,
 }
 
 impl Reader {
@@ -10,11 +11,15 @@ impl Reader {
         Reader {
             buf: buf.chars().collect(),
             cursor: 0,
+            line_number: 0,
         }
     }
 
     pub fn next(&mut self) -> Option<&char> {
         if let Some(c) = self.buf.get(self.cursor) {
+            if *c == '\n' {
+                self.line_number += 1;
+            }
             self.cursor += 1;
             return Some(c);
         }
@@ -30,14 +35,22 @@ impl Reader {
 
     pub fn prev(&mut self) -> Option<&char> {
         self.cursor = self.cursor.checked_sub(1)?;
-        self.buf.get(self.cursor)
+        if let Some(c) = self.buf.get(self.cursor) {
+            if *c == '\n' {
+                self.line_number += 1;
+            }
+            return Some(c);
+        }
+        None
     }
 
+    /// This function break the line counter
     pub fn start(&mut self) -> &mut Self {
         self.cursor = 0;
         self
     }
 
+    /// This function break the line counter
     pub fn end(&mut self) -> &mut Self {
         self.cursor = self.buf.len();
         self
@@ -45,12 +58,17 @@ impl Reader {
 
     pub fn skip_space(&mut self) -> &mut Self {
         while let Some(c) = self.next() {
-            if c != &' ' {
-                self.prev(); // to get back on te last chr
-                break;
+            if c == &' ' || c == &'\t' || c == &'\n' {
+                continue;
             }
+            self.prev(); // to get back on the last non shit chr
+            break;
         }
         self
+    }
+
+    pub fn line_number(&self) -> usize {
+        self.line_number
     }
 }
 
