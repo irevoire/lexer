@@ -44,8 +44,26 @@ impl Reader {
         None
     }
 
+    /// Define what should separate each word in the langage
+    /// At this time it's ' ', '\n', '\n'
     fn is_separator(c: char) -> bool {
         c == ' ' || c == '\t' || c == '\n'
+    }
+
+    /// Return a word between the current position and the next separator
+    /// See the is_separator function to see when it stop
+    /// TODO This function do a copy of the word. It could probably do it
+    /// in place with a better way to handle the buffer
+    pub fn get_word(&mut self) -> String {
+        let start = self.cursor;
+
+        while let Some(c) = self.next() {
+            if Reader::is_separator(*c) {
+                self.prev();
+                break;
+            }
+        }
+        self.buf[start..self.cursor].iter().collect::<String>()
     }
 
     pub fn skip_space(&mut self) -> &mut Self {
@@ -147,6 +165,15 @@ mod tests {
         assert_eq!(reader.cursor, 0);
         assert_eq!(reader.prev(), None);
         assert_eq!(reader.cursor, 0);
+    }
+
+    #[test]
+    fn test_get_word() {
+        let mut reader = init("Hello Word!");
+        assert_eq!(reader.get_word(), "Hello");
+        assert_eq!(reader.next(), Some(&' '));
+        assert_eq!(reader.get_word(), "Word!");
+        assert_eq!(reader.next(), None);
     }
 
     #[test]
