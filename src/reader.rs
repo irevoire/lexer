@@ -44,18 +44,6 @@ impl Reader {
         None
     }
 
-    /// This function break the line counter
-    pub fn start(&mut self) -> &mut Self {
-        self.cursor = 0;
-        self
-    }
-
-    /// This function break the line counter
-    pub fn end(&mut self) -> &mut Self {
-        self.cursor = self.buf.len();
-        self
-    }
-
     pub fn skip_space(&mut self) -> &mut Self {
         while let Some(c) = self.next() {
             if c == &' ' || c == &'\t' || c == &'\n' {
@@ -107,15 +95,6 @@ mod tests {
     }
 
     #[test]
-    fn test_end_and_prev() {
-        let mut reader = init("ab");
-        reader.end();
-        assert_eq!(reader.prev(), Some(&'b'));
-        assert_eq!(reader.prev(), Some(&'a'));
-        assert_eq!(reader.prev(), None);
-    }
-
-    #[test]
     fn test_empty_prev() {
         let mut reader = init("");
         assert_eq!(reader.prev(), None);
@@ -138,16 +117,6 @@ mod tests {
         assert_eq!(reader.prev(), Some(&'a'));
         assert_eq!(reader.cursor, 0);
         assert_eq!(reader.prev(), None);
-        assert_eq!(reader.cursor, 0);
-    }
-
-    #[test]
-    fn test_start_and_end() {
-        let mut reader = init("ab");
-        assert_eq!(reader.cursor, 0);
-        reader.end();
-        assert_eq!(reader.cursor, 2);
-        reader.start();
         assert_eq!(reader.cursor, 0);
     }
 
