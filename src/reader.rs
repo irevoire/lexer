@@ -37,7 +37,7 @@ impl Reader {
         self.cursor = self.cursor.checked_sub(1)?;
         if let Some(c) = self.buf.get(self.cursor) {
             if *c == '\n' {
-                self.line_number += 1;
+                self.line_number -= 1;
             }
             return Some(c);
         }
@@ -173,5 +173,28 @@ mod tests {
         assert_eq!(reader.next(), Some(&'e'));
         reader.skip(10);
         assert_eq!(reader.next(), None);
+    }
+
+    #[test]
+    fn test_line_number_next() {
+        let mut reader = init("a\nc");
+        assert_eq!(reader.line_number(), 0);
+        reader.next();
+        assert_eq!(reader.line_number(), 0);
+        reader.next();
+        assert_eq!(reader.line_number(), 1);
+        reader.next();
+        assert_eq!(reader.line_number(), 1);
+    }
+
+    #[test]
+    fn test_line_number_prev() {
+        let mut reader = init("a\nc");
+        reader.next();
+        reader.next(); // line number should be one
+        reader.prev(); // we should go back to zero
+        assert_eq!(reader.line_number(), 0);
+        reader.prev();
+        assert_eq!(reader.line_number(), 0);
     }
 }
