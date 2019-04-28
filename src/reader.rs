@@ -66,7 +66,7 @@ impl Reader {
         self.buf[start..self.cursor].iter().collect::<String>()
     }
 
-    pub fn skip_space(&mut self) -> &mut Self {
+    pub fn skip_separator(&mut self) -> &mut Self {
         while let Some(c) = self.next() {
             if Reader::is_separator(*c) {
                 continue;
@@ -177,15 +177,15 @@ mod tests {
     }
 
     #[test]
-    fn test_skip_space() {
+    fn test_skip_separator() {
         let mut reader = init("   a    bc  ");
-        reader.skip_space();
+        reader.skip_separator();
         assert_eq!(reader.next(), Some(&'a'));
-        reader.skip_space();
+        reader.skip_separator();
         assert_eq!(reader.next(), Some(&'b'));
-        reader.skip_space();
+        reader.skip_separator();
         assert_eq!(reader.next(), Some(&'c'));
-        reader.skip_space();
+        reader.skip_separator();
         assert_eq!(reader.next(), None);
     }
 
