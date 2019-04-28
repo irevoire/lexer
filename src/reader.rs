@@ -44,12 +44,16 @@ impl Reader {
         None
     }
 
+    fn is_separator(c: char) -> bool {
+        c == ' ' || c == '\t' || c == '\n'
+    }
+
     pub fn skip_space(&mut self) -> &mut Self {
         while let Some(c) = self.next() {
-            if c == &' ' || c == &'\t' || c == &'\n' {
+            if Reader::is_separator(*c) {
                 continue;
             }
-            self.prev(); // to get back on the last non shit chr
+            self.prev(); // to get back on the last non shitty chr
             break;
         }
         self
@@ -82,6 +86,18 @@ mod tests {
     }
 
     #[test]
+    fn test_next_utf8() {
+        let mut reader = init("a😘b🥰");
+        reader.next();
+        assert_eq!(reader.next(), Some(&'😘'));
+        assert_eq!(reader.cursor, 2);
+        reader.next();
+        assert_eq!(reader.next(), Some(&'🥰'));
+        assert_eq!(reader.cursor, 4);
+        assert_eq!(reader.next(), None);
+    }
+
+    #[test]
     fn test_empty_next() {
         let mut reader = init("");
         assert_eq!(reader.next(), None);
@@ -91,6 +107,19 @@ mod tests {
     #[test]
     fn test_prev() {
         let mut reader = init("ab");
+        assert_eq!(reader.prev(), None);
+    }
+
+    #[test]
+    fn test_prev_utf8() {
+        let mut reader = init("a😘b🥰");
+        reader.skip(4);
+        assert_eq!(reader.prev(), Some(&'🥰'));
+        assert_eq!(reader.cursor, 3);
+        reader.prev();
+        assert_eq!(reader.prev(), Some(&'😘'));
+        assert_eq!(reader.cursor, 1);
+        reader.prev();
         assert_eq!(reader.prev(), None);
     }
 
