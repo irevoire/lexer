@@ -11,21 +11,23 @@ pub enum Types {
     Value(String),
 }
 
-pub fn get_type(word: &str) -> Types {
-    assert!(!word.is_empty());
+pub fn get_type(word: &str) -> Option<Types> {
+    if word.is_empty() {
+        return None;
+    }
     let word = word.to_string();
     if word == "nil" {
-        return Types::Nil;
+        return Some(Types::Nil);
     }
     // unwrap should be safe since `word` is not empty
     if word.chars().next().unwrap().is_digit(10) {
-        return Types::Number(word);
+        return Some(Types::Number(word));
     }
     if let Some(k) = keywords::parse(&word) {
-        return Types::Keyword(k);
+        return Some(Types::Keyword(k));
     }
     if let Some(op) = operators::parse(&word) {
-        return Types::Operator(op);
+        return Some(Types::Operator(op));
     }
-    Types::Value(word)
+    Some(Types::Value(word))
 }

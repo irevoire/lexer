@@ -19,7 +19,7 @@ impl Tokenizer {
     pub fn next(&mut self) -> Option<Token> {
         self.reader.skip_separator();
         let word = self.reader.get_word();
-        let value = types::get_type(&word);
+        let value = types::get_type(&word)?;
         Some(Token { value })
     }
 }
