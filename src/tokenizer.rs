@@ -2,6 +2,7 @@ use crate::keywords;
 use crate::reader;
 use crate::types;
 
+#[derive(Debug)]
 pub struct Token {
     value: types::Types,
 }

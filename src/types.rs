@@ -1,6 +1,7 @@
 use crate::keywords;
 use crate::operators;
 
+#[derive(Debug)]
 pub enum Types {
     Nil,
     Number(String),
